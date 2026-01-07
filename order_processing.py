@@ -67,6 +67,9 @@ def calculate_discount(subtotal, coupon):
     else:
         raise ValueError("unknown coupon")
 
+def calculate_tax(amount):
+    return int(amount * TAX_RATE)
+
 def process_checkout(request: dict) -> dict:
     user_id, items, coupon, currency = parse_request(request)
 
@@ -76,12 +79,9 @@ def process_checkout(request: dict) -> dict:
 
     discount = calculate_discount(subtotal, coupon)
 
+    total_after_discount = max(subtotal - discount, 0)
 
-    total_after_discount = subtotal - discount
-    if total_after_discount < 0:
-        total_after_discount = 0
-
-    tax = int(total_after_discount * 0.21)
+    tax = calculate_tax(total_after_discount)
     total = total_after_discount + tax
 
     order_id = str(user_id) + "-" + str(len(items)) + "-" + "X"
