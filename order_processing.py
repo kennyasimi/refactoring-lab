@@ -69,6 +69,8 @@ def calculate_discount(subtotal, coupon):
 
 def calculate_tax(amount):
     return int(amount * TAX_RATE)
+def generate_order_id(user_id, items):
+    return f"{user_id}-{len(items)}-X"
 
 def process_checkout(request: dict) -> dict:
     user_id, items, coupon, currency = parse_request(request)
@@ -82,9 +84,10 @@ def process_checkout(request: dict) -> dict:
     total_after_discount = max(subtotal - discount, 0)
 
     tax = calculate_tax(total_after_discount)
+
     total = total_after_discount + tax
 
-    order_id = str(user_id) + "-" + str(len(items)) + "-" + "X"
+    order_id = generate_order_id(user_id, items)
 
     return {
         "order_id": order_id,
